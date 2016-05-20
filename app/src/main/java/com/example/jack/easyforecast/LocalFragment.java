@@ -1,6 +1,7 @@
 package com.example.jack.easyforecast;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -41,7 +42,9 @@ public class LocalFragment extends Fragment implements LocationListener{
     private OnFragmentInteractionListener mListener;
     private View view;
     private TextView txt;
+    private TextView status;
     private TextView temp;
+    private String icon;
     private ImageView img;
     private String response;
     private LocationManager locationManager;
@@ -75,6 +78,7 @@ public class LocalFragment extends Fragment implements LocationListener{
         view = inflater.inflate(R.layout.fragment_local, container, false);
         txt = (TextView) view.findViewById(R.id.locationText);
         temp =(TextView) view.findViewById(R.id.temp);
+        status =(TextView) view.findViewById(R.id.status);
         img = (ImageView)view.findViewById(R.id.imageView);
         txt.setText("");
         //localizzo l'utente
@@ -124,11 +128,15 @@ public class LocalFragment extends Fragment implements LocationListener{
     public void requestForcast(String nomecitta){
         //img.setBackgroundResource(R.drawable.cloudy);
         //start request
+        nomecitta = nomecitta.replace(" ","");
         AsyncHttpClient client = new AsyncHttpClient();
         Log.d("NOMEcitta",nomecitta.toLowerCase());
-        client.get("http://api.openweathermap.org/data/2.5/weather?q="+nomecitta.toLowerCase()+"&APPID=3785f98c8a216d5047f935ad5c4cd02a" , new AsyncHttpResponseHandler() {
+        //https://api.forecast.io/forecast/8c83705e47a2b9dd696aa361d375924b/37.8267,-122.423
+        //http://api.openweathermap.org/data/2.5/weather?q="+nomecitta.toLowerCase()+"&APPID=3785f98c8a216d5047f935ad5c4cd02a
+        client.get("https://api.forecast.io/forecast/8c83705e47a2b9dd696aa361d375924b/"+latitude+","+longitude , new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                Log.d("URL:","https://api.forecast.io/forecast/8c83705e47a2b9dd696aa361d375924b/"+latitude+","+longitude);
                 try {
                     jsonObject = new JSONObject(new String(responseBody));
                     Log.d("OnSuccess","gotJSON");
@@ -137,20 +145,63 @@ public class LocalFragment extends Fragment implements LocationListener{
                     e.printStackTrace();
                 }
                 try {
-                        response = jsonObject.getJSONObject("main").toString();
+                        response = jsonObject.getJSONObject("currently").toString();
                         Log.d("OnSuccess","gotCurrently");
                         jsonObject = new JSONObject(response);
                         try {
                             //first subtract 32, then multiply by 100/180
-                            //temperature start
-                            temperature=0;
-                            temperature=jsonObject.getDouble("temp");
-                            temperature=(int)(temperature- 32)*100/180;
-                            temp.setText(""+temperature+" °C");
+                            //temperature start --------------
+
+                            temperature=jsonObject.getDouble("temperature");
+                            Log.d("Temp", ""+temperature);
+                            temperature=(temperature-32)*100/180;
+                            temperature=Math.ceil(temperature);
+                            int tempInt=(int)temperature;
+                            //temperature=temperature-273;
+                            temp.setText(""+tempInt+"°");
                             Log.d("OnSuccess","gotTemperature");
-                            //temperature end
-                            //TODO: addIcons
-                            //TODO: addWeatherStatus
+                            //temperature end -----------------
+                            //Start Adding drawable
+                            //img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearday));
+                            //start status ---
+                            status.setText(jsonObject.getString("summary"));
+                            //end status ---
+                            //start addicons---
+                            icon = jsonObject.getString("summary").replace("-","").replace(" ","").toLowerCase();
+                            Log.d("IMG",icon);
+                            switch (icon) {
+                                case "clearday" :
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearday));
+                                    break;
+                                case "clearnight":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearnight));
+                                    break;
+                                case "cloudy":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.cloudy));
+                                    break;
+                                case "fog" :
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.fog));
+                                    break;
+                                case "partlycloudy":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.partlycloudyday));
+                                    break;
+                                case "partlycloudynight":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.partlycloudynight));
+                                    break;
+                                case "rain":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.rain));
+                                    break;
+                                case "snow":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.snow));
+                                    break;
+                                case "wind":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.wind));
+                                    break;
+                            }
+                            //img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearday));
+                            //end icons---
+
+
 
                         } catch (JSONException e) {
                             Log.d("OnSuccess","didn't got Temperature");
