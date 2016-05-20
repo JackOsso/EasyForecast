@@ -5,29 +5,38 @@
     tools:context="com.example.jack.easyforecast.LocalFragment">
 
 
-    <TextView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textSize="25sp"
-        android:id="@+id/locationText"
-        android:layout_gravity="top"
-        android:gravity="center" />
+        android:layout_height="match_parent">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:layout_gravity="center" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="25sp"
+            android:id="@+id/locationText"
+            android:layout_gravity="top"
+            android:gravity="center"
+            android:paddingTop="8dp"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_below="@+id/locationText"
-        android:textSize="25sp"
-        android:id="@+id/temp"
-        android:layout_gravity="center_horizontal|bottom"
-        android:gravity="center" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/locationText"
+            android:textSize="25sp"
+            android:id="@+id/temp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:gravity="center"
+            android:paddingTop="8dp"/>
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:paddingTop="8dp" />
+    </LinearLayout>
 
 </FrameLayout>
