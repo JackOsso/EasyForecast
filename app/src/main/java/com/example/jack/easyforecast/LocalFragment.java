@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.loopj.android.http.*;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,7 +52,8 @@ public class LocalFragment extends Fragment implements LocationListener{
     private double latitude;
     private double longitude;
     private double temperature;
-    private  Location location=null;
+    private int tempInt=0;
+    private Location location=null;
     private JSONObject jsonObject;
 
 
@@ -113,6 +115,7 @@ public class LocalFragment extends Fragment implements LocationListener{
                     //add to get country +"-"+addresses.get(0).getCountryName()
                     txt.setText(addresses.get(0).getLocality());
                     String cityname =addresses.get(0).getLocality();
+                    cityname="Monfalcone";
                     requestForcast(cityname);
 
                 }
@@ -123,20 +126,38 @@ public class LocalFragment extends Fragment implements LocationListener{
         }
     }
 
-
+    //TODO fix name bug finded with  "Monfalcone" when you call the requestForcast method
     //richiesta Meteo
-    public void requestForcast(String nomecitta){
+    public void requestForcast(final String nomecitta){
         //img.setBackgroundResource(R.drawable.cloudy);
         //start request
-        nomecitta = nomecitta.replace(" ","");
+
         AsyncHttpClient client = new AsyncHttpClient();
         Log.d("NOMEcitta",nomecitta.toLowerCase());
         //https://api.forecast.io/forecast/8c83705e47a2b9dd696aa361d375924b/37.8267,-122.423
         //http://api.openweathermap.org/data/2.5/weather?q="+nomecitta.toLowerCase()+"&APPID=3785f98c8a216d5047f935ad5c4cd02a
-        client.get("https://api.forecast.io/forecast/8c83705e47a2b9dd696aa361d375924b/"+latitude+","+longitude , new AsyncHttpResponseHandler() {
+        int spazio =nomecitta.indexOf(" ");
+        final String nomecittafinal;
+        if(spazio>0){
+            nomecittafinal= nomecitta.substring(0,spazio);
+        }else {
+            nomecittafinal = nomecitta;
+        }
+
+        client.get("http://api.openweathermap.org/data/2.5/weather?q="+nomecittafinal.toLowerCase()+"&APPID=3785f98c8a216d5047f935ad5c4cd02a" , new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                Log.d("URL:","https://api.forecast.io/forecast/8c83705e47a2b9dd696aa361d375924b/"+latitude+","+longitude);
+
+
+                Log.d("URL:","http://api.openweathermap.org/data/2.5/weather?q="+nomecittafinal.toLowerCase()+"&APPID=3785f98c8a216d5047f935ad5c4cd02a");
+
+                /*JSONArray jsonarray = new JSONArray(jsonStr);
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject jsonobject = jsonarray.getJSONObject(i);
+                    String name = jsonobject.getString("name");
+                    String url = jsonobject.getString("url");
+                }*/
+
                 try {
                     jsonObject = new JSONObject(new String(responseBody));
                     Log.d("OnSuccess","gotJSON");
@@ -145,59 +166,88 @@ public class LocalFragment extends Fragment implements LocationListener{
                     e.printStackTrace();
                 }
                 try {
-                        response = jsonObject.getJSONObject("currently").toString();
-                        Log.d("OnSuccess","gotCurrently");
-                        jsonObject = new JSONObject(response);
+                        response = jsonObject.getJSONArray("weather").toString();
+                        Log.d("OnSuccess","gotWeather");
+                        JSONArray jsonarray = new JSONArray(response);
+                        for (int i = 0; i < jsonarray.length(); i++) {
+                            JSONObject jsonobject = jsonarray.getJSONObject(i);
+                            status.setText(jsonobject.getString("description"));
+                            icon = jsonobject.getString("icon");
+                            Log.d("icon",icon);
+                            Log.d("IMG",icon);
+                            switch (icon) {
+                                case "01d" :
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearday));
+                                    break;
+                                case "01n":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearnight));
+                                    break;
+                                case "03d":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.cloudy));
+                                    break;
+                                case "03n":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.cloudy));
+                                    break;
+                                case "04d":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.cloudy));
+                                    break;
+                                case "04n":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.cloudy));
+                                    break;
+                                case "50d" :
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.fog));
+                                    break;
+                                case "50n" :
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.fog));
+                                    break;
+                                case "02d":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.partlycloudyday));
+                                    break;
+                                case "02n":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.partlycloudynight));
+                                    break;
+                                case "09d":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.rain));
+                                    break;
+                                case "09n":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.rain));
+                                    break;
+                                case "10d":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.rain));
+                                    break;
+                                case "10n":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.rain));
+                                    break;
+                                case "13d":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.snow));
+                                    break;
+                                case "13n":
+                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.snow));
+                                    break;
+                            }
+                        }
+
+                        response = jsonObject.getJSONObject("main").toString();
+                        JSONObject jsonObject = new JSONObject(response);
                         try {
                             //first subtract 32, then multiply by 100/180
                             //temperature start --------------
-
-                            temperature=jsonObject.getDouble("temperature");
+                            temperature=jsonObject.getDouble("temp");
                             Log.d("Temp", ""+temperature);
-                            temperature=(temperature-32)*100/180;
+                            //temperature=(temperature-32)*100/180;
                             temperature=Math.ceil(temperature);
-                            int tempInt=(int)temperature;
-                            //temperature=temperature-273;
+                            temperature=temperature-273;
+                            tempInt=(int)temperature;
                             temp.setText(""+tempInt+"°");
                             Log.d("OnSuccess","gotTemperature");
                             //temperature end -----------------
                             //Start Adding drawable
                             //img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearday));
                             //start status ---
-                            status.setText(jsonObject.getString("summary"));
+                            //status.setText(jsonObject.getString("summary"));
                             //end status ---
                             //start addicons---
-                            icon = jsonObject.getString("summary").replace("-","").replace(" ","").toLowerCase();
-                            Log.d("IMG",icon);
-                            switch (icon) {
-                                case "clearday" :
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearday));
-                                    break;
-                                case "clearnight":
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearnight));
-                                    break;
-                                case "cloudy":
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.cloudy));
-                                    break;
-                                case "fog" :
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.fog));
-                                    break;
-                                case "partlycloudy":
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.partlycloudyday));
-                                    break;
-                                case "partlycloudynight":
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.partlycloudynight));
-                                    break;
-                                case "rain":
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.rain));
-                                    break;
-                                case "snow":
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.snow));
-                                    break;
-                                case "wind":
-                                    img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.wind));
-                                    break;
-                            }
+
                             //img.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.clearday));
                             //end icons---
 

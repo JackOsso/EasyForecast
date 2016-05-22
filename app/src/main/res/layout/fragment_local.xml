@@ -1,8 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.jack.easyforecast.LocalFragment">
+    android:background="@color/background">
 
 
     <LinearLayout
@@ -14,37 +13,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textSize="25sp"
+            android:textSize="34sp"
             android:id="@+id/locationText"
             android:layout_gravity="top"
             android:gravity="center"
-            android:paddingTop="8dp"/>
+            android:layout_margin="44dp"
+            android:paddingBottom="8dp"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_below="@+id/locationText"
-                android:textSize="25sp"
-                android:id="@+id/temp"
-                android:layout_gravity="center_horizontal|bottom"
-                android:gravity="center"
-                android:paddingTop="8dp"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:textSize="25sp"
+        <TextView
+                android:layout_width="wrap_content"
+                android:textSize="20sp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|bottom"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:id="@+id/status"/>
-        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/locationText"
+            android:textSize="64sp"
+            android:id="@+id/temp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:layout_weight="1"/>
 
         <ImageView
             android:layout_width="120dp"
@@ -52,6 +47,17 @@
             android:id="@+id/imageView"
             android:layout_gravity="center"
             android:layout_marginTop="34dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/locationText"
+            android:textSize="64sp"
+            android:id="@+id/test"
+            android:layout_gravity="center_horizontal|bottom"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:layout_weight="1"/>
 
     </LinearLayout>
 
